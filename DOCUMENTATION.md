@@ -111,6 +111,7 @@ Este é um sistema de chat simples semelhante ao WhatsApp, desenvolvido com **La
 ```sql
 CREATE TABLE users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    uuid UUID,
     name VARCHAR(255),
     email VARCHAR(255) UNIQUE,
     password VARCHAR(255),
@@ -120,15 +121,16 @@ CREATE TABLE users (
 
 CREATE TABLE conversations (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
     type ENUM('private', 'group') DEFAULT 'private',
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE conversation_user (
     conversation_id BIGINT UNSIGNED,
     user_id BIGINT UNSIGNED,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Quando o usuário entrou na conversa (útil para grupos)
     FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (conversation_id, user_id)

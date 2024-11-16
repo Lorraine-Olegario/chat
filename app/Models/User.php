@@ -6,10 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
+
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -17,6 +20,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'uuid',
         'name',
         'email',
         'password',
@@ -43,5 +47,22 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Gera um UUID antes de criar o usuário
+        static::creating(function ($model) {
+            $model->uuid = (string) Str::uuid(); // Gera um UUID usando a classe Str do Laravel
+        });
+    }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class)
+                    ->withPivot('joined_at') // Adiciona o campo "joined_at" no relacionamento
+                    ->withTimestamps(); // Garante que os timestamps created_at/updated_at serão gerenciados
     }
 }

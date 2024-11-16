@@ -1,0 +1,22 @@
+
+
+
+1-liastar apenas as  conversas que são do meu usario, add campo ower_id, este campo apeas deve ser informado enquanto eu não trabalho com user logado.
+
+TAREFAS
+
+- loggout
+- token não esta expirando
+
+
+
+//!explique a diferença no blog
+
+A diferença entre os dois trechos de código se resume ao contexto em que são utilizados e ao que cada um deles realiza em relação aos tokens de acesso de um usuário.
+
+1. $request->user()->currentAccessToken()->delete();
+Contexto: Este código é geralmente utilizado em um controlador que está lidando com a requisição de um usuário autenticado. Ele obtém o usuário que fez a requisição (usando $request->user()), acessa o token de acesso atual (usando currentAccessToken()) e o exclui.
+Funcionalidade: Ele deleta apenas o token de acesso atualmente em uso pelo usuário. Isso é útil, por exemplo, quando um usuário deseja sair de uma sessão em um dispositivo específico, sem afetar outros tokens que o usuário possa ter.
+2. $user->tokens()->delete();
+Contexto: Neste trecho, tokens() é um método que geralmente retorna todos os tokens de acesso associados a um usuário. Este código é utilizado para excluir todos os tokens de acesso do usuário especificado na variável $user.
+Funcionalidade: Ele deleta todos os tokens de acesso do usuário, o que significa que, após a execução desse comando, o usuário não poderá mais acessar a aplicação usando nenhum dos seus tokens anteriores.

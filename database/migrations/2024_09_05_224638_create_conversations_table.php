@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            // $table->string('name')->nullable();
+            // $table->bigInteger('owner_id')->unsigned()->nullable();
             $table->enum('type', ['private', 'group'])->default('private');
             $table->timestamps();
+
+            // $table->foreign('owner_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

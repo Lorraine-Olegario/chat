@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('conversation_user', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
+            $table->string('alias')->nullable();
+            $table->timestamp(column: 'joined_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->unsignedBigInteger('conversation_id');
 
             $table->foreign('user_id')
