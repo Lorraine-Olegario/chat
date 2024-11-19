@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Repository\ConversationRepository;
 use Auth;
 use App\Models\User;
 use App\Models\Message;
@@ -18,6 +19,11 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ConversationsController extends Controller
 {
+    public function __construct(
+        private ConversationRepository $conversationRepository
+    ) { }
+
+
     /**
      * List all conversations
      * @return void
@@ -42,20 +48,18 @@ class ConversationsController extends Controller
     {
         try {
 
-            $conversation = new Conversation();
             $user = Auth::guard('sanctum')->user();
+            $participantId = User::where('uuid', $request->participant_id)->firstOrFail();
+            $existingConversation = $this->conversationRepository->findPrivateConversation($user, $participantId);
 
-            //IDENTIFICA 2 USUARIO PELO NUMERO
-            $identify = $request->participant_id;
-            $participantId = User::where('uuid', $identify)->firstOrFail();
-
-            $existingConversation = $this->validaSeJaTemUmaConversa($user, $participantId);
             if ($existingConversation === null) {
-                $conversation = $this->cadastraConversa($request, $user, $participantId);
+                $conversation = $this->conversationRepository->create($request, $user, $participantId);
             } else {
-                $conversation = $existingConversation->users()->syncWithoutDetaching([
+                $existingConversation->users()->syncWithoutDetaching([
                     $user->id => ['alias' => $request->name, 'joined_at' => now()],
                 ]);
+
+                $conversation = $existingConversation;
             }
 
             return response()->json([
@@ -82,33 +86,5 @@ class ConversationsController extends Controller
         }
     }
 
-    public function validaSeJaTemUmaConversa($user, $participant)
-    {
-        return Conversation::where('type', 'private')
-            ->whereHas('users', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->whereHas('users', function ($query) use ($participant) {
-                $query->where('user_id', $participant->id);
-            })
-            ->first();
-    }
 
-    public function cadastraConversa($request, $user, $participantId)
-    {
-        //ADD CONVERSA
-        $conversation = new Conversation();
-        $conversation->fill($request->except('name'));
-        $conversation->save();
-
-        //um forma RUIM de validar se o id do token existe
-        User::where('id', $user->id)->firstOrFail();
-
-        $conversation->users()->syncWithoutDetaching([
-            $user->id => ['joined_at' => now(), 'alias' => $request->name],
-            $participantId->id => ['joined_at' => now()],
-        ]);
-
-        return $conversation;
-    }
 }

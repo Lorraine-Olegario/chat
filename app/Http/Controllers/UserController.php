@@ -35,9 +35,9 @@ class UserController extends Controller
         $user =  User::create($request->all());
         $token = $user->createToken('API_TOKEN');
 
-        return [
+        return response()->json([
             'data' => $user,
             'token' => $token->plainTextToken
-        ];
+        ], 201);
     }
 }
