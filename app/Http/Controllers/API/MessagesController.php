@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Http\Requests\MessagesRequest;
 use App\Http\Resources\MessageResource;
@@ -9,8 +9,8 @@ use App\Models\ConversationUser;
 use App\Models\Message;
 use App\Models\User;
 use Auth;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Http\Controllers\Controller;
 
 class MessagesController extends Controller
 {
@@ -26,27 +26,14 @@ class MessagesController extends Controller
         try {
 
             $user = Auth::guard('sanctum')->user();
-            User::where('id', $user->id)->firstOrFail();
 
-            $teste = ConversationUser::where('user_id', $request->mensageiro)
+            ConversationUser::where('user_id', $request->mensageiro)
                 ->where('conversation_id', $request->conversation_id)
-                ->first();
+                ->firstOrFail();
 
-            if (empty($teste)) {
-                $conversation = Conversation::where('id', $request->conversation_id)->get();
-                $conversation->users()->syncWithoutDetaching([$request->mensageiro => ['joined_at' => now()]]);
-            }
-
-
-            $teste2 = ConversationUser::where('user_id', $user->id)
+            ConversationUser::where('user_id', $user->id)
                 ->where('conversation_id', $request->conversation_id)
-                ->first();
-
-            if (empty($teste2)) {
-                $conversation2 = Conversation::where('id', $request->conversation_id)->get();
-                $conversation2->users()->syncWithoutDetaching([$user->id => ['joined_at' => now()]]);
-            }
-
+                ->firstOrFail();
 
             //ADD CONVERSA
             $message = new Message();

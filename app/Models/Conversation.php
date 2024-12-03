@@ -11,9 +11,7 @@ class Conversation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'user_id',
-        'owner_id',
+        'id',
         'type',
     ];
 

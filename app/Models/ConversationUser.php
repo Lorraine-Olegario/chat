@@ -12,6 +12,7 @@ class ConversationUser extends Model
 
     protected $fillable = [
         'user_id',
+        'alias',
         'conversation_id',
     ];
 

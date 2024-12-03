@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Repository\ConversationRepository;
 use Auth;
 use App\Models\User;
-use App\Models\Message;
 use App\Models\Conversation;
-use Illuminate\Http\Request;
-use App\Models\ConversationUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\ConversationRequest;
@@ -31,7 +28,7 @@ class ConversationsController extends Controller
     public function index(): AnonymousResourceCollection
     {
         $user = Auth::guard('sanctum')->user();
-        $conversations = Conversation::where('owner_id', $user->id)->get();
+        $conversations =  $user->conversations()->wherePivot('user_id', $user->id)->get();
         return ConversationResource::collection($conversations);
     }
 
@@ -55,11 +52,17 @@ class ConversationsController extends Controller
             if ($existingConversation === null) {
                 $conversation = $this->conversationRepository->create($request, $user, $participantId);
             } else {
-                $existingConversation->users()->syncWithoutDetaching([
-                    $user->id => ['alias' => $request->name, 'joined_at' => now()],
-                ]);
 
-                $conversation = $existingConversation;
+                $this->conversationRepository->updateConversation(
+                    $existingConversation,
+                    $user,
+                    $request->name
+                );
+
+                return response()->json([
+                    'message' => 'Conversa editada com sucesso!',
+                    'conversation' => $existingConversation,
+                ], 200);
             }
 
             return response()->json([
@@ -74,9 +77,7 @@ class ConversationsController extends Controller
             ], 400);
 
         } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'error' => 'Usuário não encontrado.',
-            ], 404);
+            throw new ModelNotFoundException('Usuário não encontrado.');
 
         } catch (\Throwable $th) {
             return response()->json([

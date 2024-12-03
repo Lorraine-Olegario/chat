@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Models\Conversation;
+use App\Models\User;
 
 class ConversationRepository
 {
@@ -30,5 +31,12 @@ class ConversationRepository
         ]);
 
         return $conversation;
+    }
+
+    public function updateConversation(Conversation $conversation, User $user, string $alias)
+    {
+        $conversation->users()->syncWithoutDetaching([
+            $user->id => ['alias' => $alias, 'joined_at' => now()],
+        ]);
     }
 }

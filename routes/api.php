@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\ConversationsController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MessagesController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\API\ConversationsController;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\MessagesController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

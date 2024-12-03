@@ -23,7 +23,7 @@ class LoginTest extends TestCase
             'password' => bcrypt($password = 'i-love-laravel'),
         ]);
 
-        $response = $this->post('/api/login', [
+        $this->post('/api/login', [
             'email' => $user->email,
             'password' => $password,
         ]);

@@ -62,7 +62,7 @@ class User extends Authenticatable
     public function conversations()
     {
         return $this->belongsToMany(Conversation::class)
-                    ->withPivot('joined_at') // Adiciona o campo "joined_at" no relacionamento
+                    ->withPivot('joined_at', 'alias')
                     ->withTimestamps(); // Garante que os timestamps created_at/updated_at serão gerenciados
     }
 }
