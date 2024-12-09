@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login',[AuthController::class, 'login']);
 Route::post('/user',[UserController::class, 'store']);
-Route::get('/user',[UserController::class, 'index']);
+Route::get('/users',[UserController::class, 'index']);
 
 Route::middleware(['token.valid'])->group( function () {
-
+    
     Route::post('/logout',[AuthController::class, 'logout']);
 
     Route::post('/conversations',[ConversationsController::class, 'store']); //cadastra
@@ -24,6 +24,7 @@ Route::middleware(['token.valid'])->group( function () {
     Route::get('/conversations/{name}',[ConversationsController::class, 'show']);
     Route::get('/conversations/{id}',[ConversationsController::class, 'listConversation']);
 
-    Route::post('/message',[MessagesController::class, 'store']);
+    Route::post('/message',[MessagesController::class, 'store']); //cadastra
     Route::get('/message/{idConversation}',[MessagesController::class, 'exibirTodasMensagensConversa']);
+    Route::put('/message/{idMessage}',[MessagesController::class, 'edit']);
 });
