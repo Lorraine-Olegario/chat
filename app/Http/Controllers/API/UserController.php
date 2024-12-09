@@ -15,10 +15,10 @@ class UserController extends Controller
      * @return void
      */
     public function index(): AnonymousResourceCollection
-{
-    $users = User::all();
-    return UserResource::collection($users);
-}
+    {
+        $users = User::all();
+        return UserResource::collection($users);
+    }
 
     /**
      * Show a specific resource
