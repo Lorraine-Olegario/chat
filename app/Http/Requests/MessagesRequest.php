@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class MessagesRequest extends FormRequest
 {
@@ -22,11 +24,22 @@ class MessagesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //!pegar do usuario logado, não precisa passar
-            // 'user_id' => 'required|exists:users,id',
             'conversation_id' => 'required|exists:conversations,id',
             'content' => 'required',
-            'mensageiro' => 'required',
         ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'content.required' => 'A mensagem é obrigatória.',
+            'conversation_id.required' => 'O ID da conversa é obrigatório.',
+            'conversation_id.exists' => 'A conversa não existe.',
+        ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json($validator->errors(), 422));
     }
 }
