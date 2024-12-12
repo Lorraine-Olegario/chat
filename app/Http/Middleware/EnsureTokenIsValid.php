@@ -15,9 +15,14 @@ class EnsureTokenIsValid
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth('sanctum')->check()) {
-            return response(status: Response::HTTP_UNAUTHORIZED);
+        $user = auth('sanctum')->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
+
+        // Adiciona o usuário autenticado à requisição.
+        $request->merge(['auth_user' => $user]);
 
         return $next($request);
     }

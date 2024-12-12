@@ -22,9 +22,8 @@ Route::middleware(['token.valid'])->group( function () {
     Route::post('/conversations',[ConversationsController::class, 'store']); //cadastra
     Route::get('/conversations',[ConversationsController::class, 'index']);
     Route::get('/conversations/{name}',[ConversationsController::class, 'show']);
-    Route::get('/conversations/{id}',[ConversationsController::class, 'listConversation']);
 
     Route::post('/message',[MessagesController::class, 'store']); //cadastra
-    Route::get('/message/{idConversation}',[MessagesController::class, 'exibirTodasMensagensConversa']);
+    Route::get('/message/{idConversation}',[MessagesController::class, 'index']);
     Route::put('/message/{idMessage}',[MessagesController::class, 'edit']);
 });

@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\API;
 
 use App\Repository\ConversationRepository;
-use Auth;
+
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Conversation;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\ConversationRequest;
 use App\Http\Resources\ConversationResource;
+use App\Service\ConversationService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -17,13 +19,12 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class ConversationsController extends Controller
 {
     public function __construct(
-        private ConversationRepository $conversationRepository
+        private ConversationRepository $conversationRepository,
+        private ConversationService $conversationService
     ) { }
-
 
     /**
      * List all conversations
-     * @return void
      */
     public function index(): AnonymousResourceCollection
     {
@@ -44,41 +45,19 @@ class ConversationsController extends Controller
     public function store(ConversationRequest $request)
     {
         try {
-
-            $user = Auth::guard('sanctum')->user();
+            $user = $request['auth_user'];
             $participantId = User::where('uuid', $request->participant_id)->firstOrFail();
-            $existingConversation = $this->conversationRepository->findPrivateConversation($user, $participantId);
-
-            if ($existingConversation === null) {
-                $conversation = $this->conversationRepository->create($request, $user, $participantId);
-            } else {
-
-                $this->conversationRepository->updateConversation(
-                    $existingConversation,
-                    $user,
-                    $request->name
-                );
-
-                return response()->json([
-                    'message' => 'Conversa editada com sucesso!',
-                    'conversation' => $existingConversation,
-                ], 200);
-            }
-
+    
+            $conversation = $this->conversationService->createOrUpdateConversation($request, $user, $participantId);
+    
             return response()->json([
-                'message' => 'Conversa criada com sucesso!',
+                'message' => $conversation->wasRecentlyCreated ? 'Conversa criada com sucesso!' : 'Conversa editada com sucesso!',
                 'conversation' => $conversation,
-            ], 201);
-
-        } catch (QueryException $e) {
-            return response()->json([
-                'error' => 'Erro ao iniciar uma conversa: problema no banco de dados.',
-                'details' => $e->getMessage(),
-            ], 400);
+            ], $conversation->wasRecentlyCreated ? 201 : 200);
 
         } catch (ModelNotFoundException $e) {
             throw new ModelNotFoundException('Usuário não encontrado.');
-
+            
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => 'Erro inesperado ao iniciar a conversa.',
