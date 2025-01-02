@@ -2,14 +2,47 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
-
+/**
+ * @OA\Schema(
+ *     schema="User",
+ *     type="object",
+ *     title="User",
+ *     description="User model schema",
+ *     required={"uuid", "name", "email"},
+ *     
+ *      @OA\Property(
+ *         property="id",
+ *         type="string",
+ *         description="Identifier of the user",
+ *         example="14"
+ *     ),
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         description="Name of the user",
+ *         example="John Doe"
+ *     ),
+ *     @OA\Property(
+ *         property="email",
+ *         type="string",
+ *         format="email",
+ *         description="Email address of the user",
+ *         example="johndoe@example.com"
+ *     ),
+ *     @OA\Property(
+ *         property="number",
+ *         type="string",
+ *         description="Unique identifier of the user",
+ *         example="123e4567-e89b-12d3-a456-426614174000"
+ *     )
+ * )
+ */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;

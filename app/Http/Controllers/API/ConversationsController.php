@@ -24,8 +24,39 @@ class ConversationsController extends Controller
     ) { }
 
     /**
-     * List all conversations
+     * @OA\Get(
+     *     path="/api/conversations",
+     *     summary="Get a list of conversations",
+     *     description="Retrieve a list of conversations from the database",
+     *     operationId="getconversations",
+     *     tags={"conversations"},
+     *     security={{"bearerAuth": {}}}, // Token exigido
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Conversation")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     )
+     * )
      */
+    /**
+     * @OA\SecurityScheme(
+     *     securityScheme="bearerAuth",
+     *     type="http",
+     *     scheme="bearer",
+     *     bearerFormat="JWT"
+     * )
+     */
+
     public function index(): AnonymousResourceCollection
     {
         $user = Auth::guard('sanctum')->user();
